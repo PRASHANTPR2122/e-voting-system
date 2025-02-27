@@ -1,0 +1,38 @@
+{
+  "name": "e-voting-system",
+  "version": "1.0.0",
+  "description": "Blockchain-based E-Voting System for Indian Elections",
+  "main": "truffle-config.js",
+  "scripts": {
+    "test": "truffle test",
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "keywords": [
+    "blockchain",
+    "e-voting",
+    "ethereum",
+    "smart-contracts",
+    "india"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3",
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "next": "^13.5.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "web3": "^4.1.2",
+    "ethers": "^6.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.4",
+    "@types/react": "^18.2.28",
+    "typescript": "^5.2.2",
+    "truffle": "^5.11.5"
+  }
+}
