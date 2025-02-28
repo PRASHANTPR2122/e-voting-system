@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+
 
 contract EVoting is Ownable, ReentrancyGuard {
     // Structs
@@ -98,19 +101,18 @@ contract EVoting is Ownable, ReentrancyGuard {
     function castVote(uint256 _candidateId) 
         external 
         duringVoting 
-        nonReentrant 
+        nonReentrant
     {
-        Voter storage voter = voters[msg.sender];
-        require(voter.isRegistered, "Voter not registered");
-        require(!voter.hasVoted, "Already voted");
+        require(voters[msg.sender].isRegistered, "Voter not registered");
+        require(!voters[msg.sender].hasVoted, "Already voted");
         require(_candidateId < candidates.length, "Invalid candidate");
-        require(candidates[_candidateId].constituency == voter.constituency, 
+        require(candidates[_candidateId].constituency == voters[msg.sender].constituency, 
                 "Candidate not in voter's constituency");
 
-        voter.hasVoted = true;
+        voters[msg.sender].hasVoted = true;
         candidates[_candidateId].voteCount++;
 
-        emit VoteCast(msg.sender, voter.constituency);
+        emit VoteCast(msg.sender, voters[msg.sender].constituency);
     }
 
     // View functions
@@ -118,28 +120,33 @@ contract EVoting is Ownable, ReentrancyGuard {
         return candidates.length;
     }
 
-    function getConstituencyCandidates(uint256 _constituency) 
+    function getConstituencyResults(uint256 _constituency) 
         external 
         view 
-        returns (uint256[] memory) 
+        returns (uint256[] memory candidateIds, uint256[] memory voteCounts) 
     {
-        uint256[] memory constituencyCandidates = new uint256[](candidates.length);
-        uint256 count = 0;
-        
+        require(constituencyExists[_constituency], "Invalid constituency");
+
+        uint256 constituencyCount = 0;
         for (uint256 i = 0; i < candidates.length; i++) {
             if (candidates[i].constituency == _constituency) {
-                constituencyCandidates[count] = i;
-                count++;
+                constituencyCount++;
             }
         }
 
-        // Resize array to actual count
-        uint256[] memory result = new uint256[](count);
-        for (uint256 i = 0; i < count; i++) {
-            result[i] = constituencyCandidates[i];
+        candidateIds = new uint256[](constituencyCount);
+        voteCounts = new uint256[](constituencyCount);
+
+        uint256 index = 0;
+        for (uint256 i = 0; i < candidates.length; i++) {
+            if (candidates[i].constituency == _constituency) {
+                candidateIds[index] = i;
+                voteCounts[index] = candidates[i].voteCount;
+                index++;
+            }
         }
-        
-        return result;
+
+        return (candidateIds, voteCounts);
     }
 
     function getVoterInfo(address _voter) 
